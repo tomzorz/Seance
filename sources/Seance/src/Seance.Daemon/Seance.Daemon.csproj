@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Seance.Core\Seance.Core.csproj" />
+    <ProjectReference Include="..\Seance.Transport\Seance.Transport.csproj" />
+    <ProjectReference Include="..\Seance.Platform\Seance.Platform.csproj" />
+    <ProjectReference Include="..\Seance.Platform.Windows\Seance.Platform.Windows.csproj" />
+    <ProjectReference Include="..\Seance.Platform.Linux\Seance.Platform.Linux.csproj" />
+    <ProjectReference Include="..\Seance.Platform.MacOS\Seance.Platform.MacOS.csproj" />
+  </ItemGroup>
+
+</Project>

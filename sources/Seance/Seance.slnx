@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Seance.Cli/Seance.Cli.csproj" />
+    <Project Path="src/Seance.Client/Seance.Client.csproj" />
+    <Project Path="src/Seance.Core/Seance.Core.csproj" />
+    <Project Path="src/Seance.Daemon/Seance.Daemon.csproj" />
+    <Project Path="src/Seance.Platform.Linux/Seance.Platform.Linux.csproj" />
+    <Project Path="src/Seance.Platform.MacOS/Seance.Platform.MacOS.csproj" />
+    <Project Path="src/Seance.Platform.Windows/Seance.Platform.Windows.csproj" />
+    <Project Path="src/Seance.Platform/Seance.Platform.csproj" />
+    <Project Path="src/Seance.Transport/Seance.Transport.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Seance.Core.Tests/Seance.Core.Tests.csproj" />
+  </Folder>
+</Solution>
