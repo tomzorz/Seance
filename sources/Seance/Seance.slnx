@@ -8,9 +8,11 @@
     <Project Path="src/Seance.Platform.MacOS/Seance.Platform.MacOS.csproj" />
     <Project Path="src/Seance.Platform.Windows/Seance.Platform.Windows.csproj" />
     <Project Path="src/Seance.Platform/Seance.Platform.csproj" />
+    <Project Path="src/Seance.Protocol/Seance.Protocol.csproj" />
     <Project Path="src/Seance.Transport/Seance.Transport.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Seance.Core.Tests/Seance.Core.Tests.csproj" />
+    <Project Path="tests/Seance.Protocol.Tests/Seance.Protocol.Tests.csproj" />
   </Folder>
 </Solution>
