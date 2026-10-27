@@ -1,7 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Seance.Core\Seance.Core.csproj" />
+    <ProjectReference Include="..\Seance.Protocol\Seance.Protocol.csproj" />
   </ItemGroup>
 
 </Project>
