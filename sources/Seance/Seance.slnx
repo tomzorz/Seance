@@ -14,5 +14,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/Seance.Core.Tests/Seance.Core.Tests.csproj" />
     <Project Path="tests/Seance.Protocol.Tests/Seance.Protocol.Tests.csproj" />
+    <Project Path="tests/Seance.Transport.Tests/Seance.Transport.Tests.csproj" />
   </Folder>
 </Solution>

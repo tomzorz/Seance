@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Seance.Core\Seance.Core.csproj" />
+    <ProjectReference Include="..\Seance.Protocol\Seance.Protocol.csproj" />
   </ItemGroup>
 
 </Project>

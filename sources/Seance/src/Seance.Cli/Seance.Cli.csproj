@@ -3,10 +3,12 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>presence</AssemblyName>
+    <PublishAot>true</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Seance.Client\Seance.Client.csproj" />
+    <ProjectReference Include="..\Seance.Protocol\Seance.Protocol.csproj" />
   </ItemGroup>
 
 </Project>
