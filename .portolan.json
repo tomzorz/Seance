@@ -1,0 +1,4 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tomzorz/portolan/main/docs/project.schema.json",
+  "description": "Per-user presence daemon for Windows, Linux and macOS, the C#/.NET reference implementation of the Human Presence Protocol (HPP/1): tells tools whether you are at the keyboard, on SSH, on remote desktop or gone, and where the caller came from."
+}
