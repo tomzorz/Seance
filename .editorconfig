@@ -1,0 +1,35 @@
+root = true
+
+# Line endings are LF everywhere, on purpose: `dotnet format --verify-no-changes` otherwise passes
+# on one CI runner and fails on another for reasons that have nothing to do with the code.
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml,md}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{csproj,props,targets,slnx}]
+indent_size = 2
+
+[*.cs]
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_indent_case_contents = true
+csharp_indent_case_contents_when_block = false
+csharp_indent_switch_labels = true
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# House style: a single-statement branch goes on the same line without braces, and anything that
+# spills onto its own line gets them.
+csharp_prefer_braces = when_multiline:silent

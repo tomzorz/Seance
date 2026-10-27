@@ -1,3 +1,7 @@
+# Normalise text files to LF in the working tree, not just in the object database:
+# the format check has to give the same answer on every CI runner.
+* text=auto eol=lf
+
 # Thanks for some of the stuff below to https://robots.thoughtbot.com/how-to-git-with-unity
 
 # 3D models
