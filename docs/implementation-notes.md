@@ -7,13 +7,17 @@ Working notes for building Seance. The protocol itself — data model, semantics
 ```csharp
 public interface ISurfaceProvider
 {
-    Task<IReadOnlyList<Surface>> SnapshotAsync(CancellationToken ct);
-    IAsyncEnumerable<PresenceEvent> WatchAsync(CancellationToken ct);
     ProviderCapabilities Capabilities { get; }
+    Task<IReadOnlyList<Surface>> SnapshotAsync(CancellationToken ct);
+    IAsyncEnumerable<ProviderChangeSignal> WatchAsync(CancellationToken ct);
 }
 ```
 
 The trait is deliberately `enumerate surfaces`, not `get idle time` + `is remote`. What varies across platforms is not just how you detect idle — it's what a session fundamentally is. Windows has WTS sessions, Linux has logind sessions, macOS barely has the concept. Let each provider construct the list however it likes.
+
+`WatchAsync` yields a bare change signal, not an event. An earlier draft of this contract had providers yield `PresenceEvent`, which would have put "does this count as a lock change" in three platform files instead of one: two providers would eventually have disagreed, and the wire would have carried the disagreement. Providers now say only "something moved"; `PresenceEngine` re-snapshots and `SnapshotDiff` decides the reason. A provider that cannot push returns an empty sequence and sets `IsPushCapable = false`, which puts the engine on a poll loop.
+
+`ISurfaceProvider` lives in `Seance.Core`, not `Seance.Platform`: it is Core's input contract, and Core cannot reference the platform assemblies that implement it. `Seance.Platform` holds helpers shared between the real providers.
 
 `ProviderCapabilities` carries one internal flag beyond the wire capabilities (REQ-CAP-1): `IsPushCapable`. When false, Core drives a poll loop against `SnapshotAsync`; when true, the provider pushes through `WatchAsync`. This flag never crosses the wire — clients always get push events regardless of how the daemon sources them.
 
@@ -128,8 +132,8 @@ Set `IsPushCapable = false`; core drives the poll loop.
 
 ## Build order
 
-1. **Core types + hysteresis + pin logic**, with a `FakeSurfaceProvider`. Full test coverage. No OS code.
-2. **Transport + CLI** against the fake provider. End-to-end query/subscribe working on one machine.
+1. ~~**Core types + hysteresis + pin logic**, with a `FakeSurfaceProvider`. Full test coverage. No OS code.~~ Done.
+2. ~~**Transport + CLI** against the fake provider. End-to-end query/subscribe working on one machine.~~ Done, minus the optional TCP binding, which stays off until someone needs it (REQ-TCP-1 forbids it by default anyway).
 3. **Linux provider** (logind). Easiest real platform, validates the abstraction.
 4. **Windows provider** (CsWin32 + WTS). Per-session daemon.
 5. **Caller resolution** on both, including ancestry walking.
@@ -142,8 +146,17 @@ Set `IsPushCapable = false`; core drives the poll loop.
 
 ## Open questions
 
-1. **Where do wire contracts live?** The handoff put them in `Seance.Transport`, but `Seance.Client` needs the same types without dragging in the server. Likely answer: contracts move to `Seance.Core` (they are the protocol's data model, which Core already owns) or a small `Seance.Protocol` project. Decide at build-order step 2.
-2. **Wayland idle shim** — build the C shim, or accept coarse `IdleHint`? Deferred past v1, but flag early if `IdleHint` turns out to be unusable.
-3. **OSC emission helper.** The daemon carries no fallback channels (reachability is facts-only per spec §5.5); emitting OSC into the client's own terminal on empty reachability is a `Seance.Client` convenience. Design at step 7.
+1. **Wayland idle shim** — build the C shim, or accept coarse `IdleHint`? Deferred past v1, but flag early if `IdleHint` turns out to be unusable.
+2. **OSC emission helper.** The daemon carries no fallback channels (reachability is facts-only per spec §5.5); emitting OSC into the client's own terminal on empty reachability is a `Seance.Client` convenience. Design at step 7.
 
 (The old "policy configuration format" question dissolved when `recommend()` became the deterministic `presence.reach`: there is no daemon policy to configure.)
+
+## Settled
+
+**Where wire contracts live: `Seance.Protocol`.** Core would have worked, but `Seance.Client` is meant to be consumable by other people, and pointing it at Core would have shipped the daemon engine — poll loops, subscriber fan-out, pin storage — inside the client library. `Seance.Protocol` holds the data model, the enum spellings, endpoint discovery, and the NDJSON framing, and depends on nothing. Core, Transport, Client, and the CLI all reference it. The framing lives there too because it is the wire (spec §6.1), and both ends need it.
+
+**An unknown caller origin matches no kind group.** Step 5.2 of the reach procedure ranks "candidates whose `kind` equals the caller's `originKind`" second. Read literally, draft 1 of the spec matched a caller whose origin could not be inferred against surfaces of kind `unknown`, sorting the least understood surface above the local seat — and every token-verified connection reports an unknown origin (REQ-CTX-3), so it was not a corner case. Raised, fixed in SPEC.md, and shipped as HPP/1 draft 2; the implementation follows the spec rather than the other way round.
+
+**JSON-RPC: hand-rolled, no StreamJsonRpc.** The framing is one JSON object per line and the method table has seven entries; against that, a reflection-driven RPC stack is all cost. `PresenceConnection` reads a frame, parses it with `JsonDocument`, dispatches on a string, and writes the response through `Utf8JsonWriter` with source-generated type info. The id element is copied through verbatim, so a number stays a number and a string stays a string.
+
+**NativeAOT is verified, not assumed.** `dotnet publish -r win-x64` runs ILC over the whole daemon — Generic Host, dependency injection, source-generated serializers — and produces the object file with zero trim or AOT warnings, under `TreatWarningsAsErrors`. Every library carries `IsAotCompatible` from the first commit so a reflection-shaped mistake fails the ordinary build rather than a release six months later. DI registrations use explicit factory lambdas rather than `AddSingleton<T>()` generic activation, which keeps the container out of reflection entirely.
